@@ -19,7 +19,7 @@ public class HexMesh : MonoBehaviour {
     //list of all the colors in the mesh
     List<Color> colors;
 
-    void Awake()
+    private void Awake()
     {
         //create a new mesh and give a refference to the filter and to this script
         GetComponent<MeshFilter>().mesh = hexMesh = new Mesh();
@@ -79,7 +79,7 @@ public class HexMesh : MonoBehaviour {
     /// </summary>
     /// <param name="direction"></param>
     /// <param name="hex"></param>
-    void createHex(HexDirection direction, HexCell hex)
+    private void createHex(HexDirection direction, HexCell hex)
     {   
         //create six triangles to represent the hex(could be made four but that is more complicated)
             //the center of the hex needed to find the corners
@@ -89,15 +89,12 @@ public class HexMesh : MonoBehaviour {
 		    Vector3 v2 = center + HexMetrics.getSecondSolidCorner(direction);
             //add a solid color triangle to the triangles list
             AddTriangle(center, v1, v2);
-            AddTriangleColor(hex.color);
+            AddTriangleColor(hex.color);            
 
-            ///now add a quad to blend color between hexes
-            //get the outer corners of the quad
-            Vector3 quadOffset = HexMetrics.getBlendQuad(direction);//the offset from the original corners
-		    Vector3 v3 = v1 + quadOffset;
-		    Vector3 v4 = v2 + quadOffset;
+            //create the area of the hex that is color blended
+            createBlendedHex(direction, hex,v1,v2);
 
-
+            /*
             //get the neighbors of the hex
             //get the previous neighbor
             HexCell prevNeighbor = hex.getNeighbor(direction.Previous()) ?? hex;
@@ -105,13 +102,45 @@ public class HexMesh : MonoBehaviour {
             HexCell neighbor = hex.getNeighbor(direction) ?? hex;
             //get the next neighbor
             HexCell nextNeighbor = hex.getNeighbor(direction.Next()) ?? hex;
-            //average the cell colors to get an accurate color of the blend
-            //Color edgeColor = (hex.color + neighbor.color) * 0.5f;
-
-
+            //average the hex colors to get an accurate color of the blend
+            Color edgeColor = (hex.color + neighbor.color) * 0.5f;
             //add the blended color quad to the mesh
             AddQuad(v1,v2,v3,v4);
             AddQuadColor(hex.color, (hex.color + neighbor.color) / 2f);
+
+            //create the triangles for the 3 way intersection of hexes
+            AddTriangle(v1, center + HexMetrics.getFirstCorner(direction), v3);
+		    AddTriangleColor(hex.color, (hex.color + prevNeighbor.color + neighbor.color) / 3f, edgeColor);
+            AddTriangle(v2, v4, center + HexMetrics.getSecondCorner(direction));
+		    AddTriangleColor(hex.color, edgeColor, (hex.color + neighbor.color + nextNeighbor.color) / 3f);
+            */
+    }
+
+    private void createBlendedHex(HexDirection direction, HexCell hex, Vector3 v1, Vector3 v2)
+    {
+        //get the neighbor of the hex
+        HexCell neighbor = hex.getNeighbor(direction);
+		if (neighbor == null) {
+			return;
+		}
+        
+        //get the outer corners of the quad
+        Vector3 quadOffset = HexMetrics.getBlendQuad(direction);//the offset from the original corners
+		Vector3 v3 = v1 + quadOffset;
+		Vector3 v4 = v2 + quadOffset;
+
+        if(direction <= HexDirection.DR)
+        {
+            //add the blended color quad to the mesh
+            AddQuad(v1,v2,v3,v4);
+            AddQuadColor(hex.color, neighbor.color);
+        }
+        //create a blended triangle 
+        HexCell nextNeighbor = hex.getNeighbor(direction.Next());
+		if (direction <= HexDirection.R && nextNeighbor != null) {
+            AddTriangle(v2, v4, v2 + HexMetrics.getBlendQuad(direction.Next()));
+			AddTriangleColor(hex.color, neighbor.color, nextNeighbor.color);
+		}
     }
 
     /// <summary>
@@ -120,7 +149,7 @@ public class HexMesh : MonoBehaviour {
     /// <param name="c1">the first color</param>
     /// <param name="c2">the second color</param>
     /// <param name="c3">the third color</param>
-    void AddTriangleColor(Color c1, Color c2, Color c3)
+    private void AddTriangleColor(Color c1, Color c2, Color c3)
     {
         colors.Add(c1);
         colors.Add(c2);
@@ -131,7 +160,7 @@ public class HexMesh : MonoBehaviour {
     /// adds the color of a solid triangle
     /// </summary>
     /// <param name="c1">the color of the triangle</param>
-    void AddTriangleColor(Color c1)
+    private void AddTriangleColor(Color c1)
     {
         colors.Add(c1);
         colors.Add(c1);
@@ -144,7 +173,7 @@ public class HexMesh : MonoBehaviour {
     /// <param name="v1"></param>
     /// <param name="v2"></param>
     /// <param name="v3"></param>
-    void AddTriangle(Vector3 v1, Vector3 v2, Vector3 v3)
+    private void AddTriangle(Vector3 v1, Vector3 v2, Vector3 v3)
     {
         //the point to begin adding the new corners to
         int vertexIndex = vertices.Count;
@@ -161,7 +190,7 @@ public class HexMesh : MonoBehaviour {
     //creates a quad 
     //this is better than adding two triangles because it makes the vertices list smaller
     //this is used to create color blended regions between the hexes
-    void AddQuad (Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4) {
+    private void AddQuad (Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4) {
 		int vertexIndex = vertices.Count;
         //add the vertices of the quad
 		vertices.Add(v1);
@@ -179,7 +208,7 @@ public class HexMesh : MonoBehaviour {
 
     /*
     //adds the colors to the quad
-	void AddQuadColor (Color c1, Color c2, Color c3, Color c4) {
+	private void AddQuadColor (Color c1, Color c2, Color c3, Color c4) {
 		colors.Add(c1);
 		colors.Add(c2);
 		colors.Add(c3);
@@ -187,7 +216,7 @@ public class HexMesh : MonoBehaviour {
 	}
     */
     //takes two colors to color a quad
-    void AddQuadColor (Color c1, Color c2) {
+    private void AddQuadColor (Color c1, Color c2) {
 		colors.Add(c1);
 		colors.Add(c1);
 		colors.Add(c2);

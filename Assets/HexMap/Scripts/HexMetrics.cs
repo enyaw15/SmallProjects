@@ -30,30 +30,35 @@ public class HexMetrics {
     /// </summary>
     /// <param name="direction"></param>
     /// <returns> returns the vector of the first corner of the hex in a given direction</returns>
-    public static Vector3 GetFirstCorner(HexDirection direction)
+    public static Vector3 getFirstCorner(HexDirection direction)
     {
         return corners[(int)direction];
     }
-
 
     /// <summary>
     /// returns the second corner of an edge as specified by the direction
     /// </summary>
     /// <param name="direction"></param>
     /// <returns> returns the vector of the second corner of the hex in a given direction</returns>
-    public static Vector3 GetSecondCorner(HexDirection direction)
+    public static Vector3 getSecondCorner(HexDirection direction)
     {
         return corners[(int)direction + 1];
     }
 
     //returns the position of the corner for the portion of the hexagon which is solid color
-    public static Vector3 GetFirstSolidCorner (HexDirection direction) {
+    public static Vector3 getFirstSolidCorner (HexDirection direction) {
 		return corners[(int)direction] * solidFactor;
 	}
 
     //returns the position of the corner for the portion of the hexagon which is solid color
-	public static Vector3 GetSecondSolidCorner (HexDirection direction) {
+	public static Vector3 getSecondSolidCorner (HexDirection direction) {
 		return corners[(int)direction + 1] * solidFactor;
+	}
+
+    //returns the distance between the solid hex corners and the outer corners of the blended quad going between two solid hexes
+    //(getBridge)
+    public static Vector3 getBlendQuad (HexDirection direction) {
+		return (corners[(int)direction] + corners[(int)direction + 1]) * blendFactor;
 	}
     
 }
