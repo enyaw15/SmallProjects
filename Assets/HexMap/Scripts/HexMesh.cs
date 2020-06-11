@@ -44,7 +44,7 @@ public class HexMesh : MonoBehaviour {
         triangles.Clear();
         colors.Clear();
 
-        //loop through and generate new triangles 
+        //loop through and generate new triangles for each hex
         for (int i = 0; i < hexes.Length; i++)
         {
             createHex(hexes[i]);
@@ -82,21 +82,21 @@ public class HexMesh : MonoBehaviour {
     void createHex(HexDirection direction, HexCell hex)
     {   
         //create six triangles to represent the hex(could be made four but that is more complicated)
-        for (int i = 0; i < 6; i++)
-        {
             //the center of the hex needed to find the corners
             Vector3 center = hex.transform.localPosition;
             //holds the value of the corners of the solid part of the hexagon
-		    Vector3 v1 = center + HexMetrics.GetFirstSolidCorner(direction);
-		    Vector3 v2 = center + HexMetrics.GetSecondSolidCorner(direction);
+		    Vector3 v1 = center + HexMetrics.getFirstSolidCorner(direction);
+		    Vector3 v2 = center + HexMetrics.getSecondSolidCorner(direction);
             //add a solid color triangle to the triangles list
             AddTriangle(center, v1, v2);
             AddTriangleColor(hex.color);
 
             ///now add a quad to blend color between hexes
             //get the outer corners of the quad
-		    Vector3 v3 = center + HexMetrics.GetFirstCorner(direction);
-		    Vector3 v4 = center + HexMetrics.GetSecondCorner(direction);
+            Vector3 quadOffset = HexMetrics.getBlendQuad(direction);//the offset from the original corners
+		    Vector3 v3 = v1 + quadOffset;
+		    Vector3 v4 = v2 + quadOffset;
+
 
             //get the neighbors of the hex
             //get the previous neighbor
@@ -111,8 +111,7 @@ public class HexMesh : MonoBehaviour {
 
             //add the blended color quad to the mesh
             AddQuad(v1,v2,v3,v4);
-            AddQuadColor(hex.color, hex.color, (hex.color + prevNeighbor.color + neighbor.color) / 3f, (hex.color + neighbor.color + nextNeighbor.color) / 3f);
-        }
+            AddQuadColor(hex.color, (hex.color + neighbor.color) / 2f);
     }
 
     /// <summary>
@@ -178,6 +177,7 @@ public class HexMesh : MonoBehaviour {
 		triangles.Add(vertexIndex + 3);
 	}
 
+    /*
     //adds the colors to the quad
 	void AddQuadColor (Color c1, Color c2, Color c3, Color c4) {
 		colors.Add(c1);
@@ -185,5 +185,12 @@ public class HexMesh : MonoBehaviour {
 		colors.Add(c3);
 		colors.Add(c4);
 	}
-
+    */
+    //takes two colors to color a quad
+    void AddQuadColor (Color c1, Color c2) {
+		colors.Add(c1);
+		colors.Add(c1);
+		colors.Add(c2);
+		colors.Add(c2);
+	}
 }
