@@ -14,12 +14,12 @@ public enum HexDirection
    //NE, E, SE, SW, W, NW
 }
 
-//returns the opposite direction of the current one
+
 public static class HexDirectionExtensions
 {
 
     /// <summary>
-    /// returns the opposite direction
+    //returns the opposite direction of the current one
     /// </summary>
     /// <param name="direction"></param>
     /// <returns> returns the opposite direction </returns>

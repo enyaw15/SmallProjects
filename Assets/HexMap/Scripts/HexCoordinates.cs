@@ -109,6 +109,4 @@ public struct HexCoordinates
     {
         return X.ToString() + "\n" + Y.ToString() + "\n" + Z.ToString();
     }
-
-    
 }

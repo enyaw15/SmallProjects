@@ -35,7 +35,7 @@ public class HexMesh : MonoBehaviour {
     /// <summary>
     /// creates a mesh based on an array of HexCells (Triangulate)
     /// </summary>
-    /// <param name="hexes"></param>
+    /// <param name="hexes">the array of hexes</param>
     public void createHexMesh(HexCell[] hexes)
     {
         //clear all the data so it can be recreated
@@ -86,10 +86,19 @@ public class HexMesh : MonoBehaviour {
         {
             //the center of the hex needed to find the corners
             Vector3 center = hex.transform.localPosition;
-            //add a triangle to the triangles list
-            AddTriangle(center, center + HexMetrics.GetFirstCorner(direction), center + HexMetrics.GetSecondCorner(direction));
+            //holds the value of the corners of the solid part of the hexagon
+		    Vector3 v1 = center + HexMetrics.GetFirstSolidCorner(direction);
+		    Vector3 v2 = center + HexMetrics.GetSecondSolidCorner(direction);
+            //add a solid color triangle to the triangles list
+            AddTriangle(center, v1, v2);
+            AddTriangleColor(hex.color);
 
-            //get the neighbors of the hex that effect this triangle
+            ///now add a quad to blend color between hexes
+            //get the outer corners of the quad
+		    Vector3 v3 = center + HexMetrics.GetFirstCorner(direction);
+		    Vector3 v4 = center + HexMetrics.GetSecondCorner(direction);
+
+            //get the neighbors of the hex
             //get the previous neighbor
             HexCell prevNeighbor = hex.getNeighbor(direction.Previous()) ?? hex;
             //get the neighbor of the hex to get its color
@@ -97,23 +106,37 @@ public class HexMesh : MonoBehaviour {
             //get the next neighbor
             HexCell nextNeighbor = hex.getNeighbor(direction.Next()) ?? hex;
             //average the cell colors to get an accurate color of the blend
-            Color edgeColor = (hex.color + neighbor.color) * 0.5f;
-            //add the colors of the hex to the colors array (average the colors that effect the edge)
-            AddTriangleColor(hex.color, (hex.color + prevNeighbor.color + neighbor.color) / 3f, (hex.color + neighbor.color + nextNeighbor.color) / 3f);
+            //Color edgeColor = (hex.color + neighbor.color) * 0.5f;
+
+
+            //add the blended color quad to the mesh
+            AddQuad(v1,v2,v3,v4);
+            AddQuadColor(hex.color, hex.color, (hex.color + prevNeighbor.color + neighbor.color) / 3f, (hex.color + neighbor.color + nextNeighbor.color) / 3f);
         }
     }
 
     /// <summary>
-    /// 
+    /// adds the colors of a blended triangle
     /// </summary>
-    /// <param name="c1"></param>
-    /// <param name="c2"></param>
-    /// <param name="c3"></param>
+    /// <param name="c1">the first color</param>
+    /// <param name="c2">the second color</param>
+    /// <param name="c3">the third color</param>
     void AddTriangleColor(Color c1, Color c2, Color c3)
     {
         colors.Add(c1);
         colors.Add(c2);
         colors.Add(c3);
+    }
+
+    /// <summary>
+    /// adds the color of a solid triangle
+    /// </summary>
+    /// <param name="c1">the color of the triangle</param>
+    void AddTriangleColor(Color c1)
+    {
+        colors.Add(c1);
+        colors.Add(c1);
+        colors.Add(c1);
     }
 
     /// <summary>
@@ -135,5 +158,32 @@ public class HexMesh : MonoBehaviour {
         triangles.Add(vertexIndex + 1);
         triangles.Add(vertexIndex + 2);
     }
+
+    //creates a quad 
+    //this is better than adding two triangles because it makes the vertices list smaller
+    //this is used to create color blended regions between the hexes
+    void AddQuad (Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4) {
+		int vertexIndex = vertices.Count;
+        //add the vertices of the quad
+		vertices.Add(v1);
+		vertices.Add(v2);
+		vertices.Add(v3);
+		vertices.Add(v4);
+        //create the two triangles of the quad
+		triangles.Add(vertexIndex);
+		triangles.Add(vertexIndex + 2);
+		triangles.Add(vertexIndex + 1);
+		triangles.Add(vertexIndex + 1);
+		triangles.Add(vertexIndex + 2);
+		triangles.Add(vertexIndex + 3);
+	}
+
+    //adds the colors to the quad
+	void AddQuadColor (Color c1, Color c2, Color c3, Color c4) {
+		colors.Add(c1);
+		colors.Add(c2);
+		colors.Add(c3);
+		colors.Add(c4);
+	}
 
 }
