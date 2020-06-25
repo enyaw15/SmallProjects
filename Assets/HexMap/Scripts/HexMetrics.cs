@@ -6,13 +6,14 @@ public class HexMetrics {
 
     //the outer radius of a hexagon
     public const float outerRadius = 10f;
-
     //the inner radius of a hexagon
     public const float innerRadius = outerRadius * 0.866025404f;//outerRadius * 3^1/2 /2
-
+    
     //theses are used to blend colors only near the edge of the hexagons
     public const float solidFactor = .8f;//what fraction of the hex shoud be solid
     public const float blendFactor = 1f - solidFactor;//the fraction of the hex that is blended
+
+    public const float elevationStep = 5f;
 
     //holds the corners of a hexagon
     private static Vector3[] corners = {//switch x's and y's inorder to rotate hexagons by 90 degrees

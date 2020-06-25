@@ -8,7 +8,6 @@ public class HexGrid : MonoBehaviour {
     //hold color
     public Color defaultColor = Color.white;
 
-
     //height and width of the grid
     public int height = 10;
     public int width = 10;
@@ -115,15 +114,21 @@ public class HexGrid : MonoBehaviour {
     }
 
     /*
-     *  accepts a position and a color and changes the hex at the position to that color 
+     *  returns the hex at a given position 
      */
-    public void colorHex(Vector3 position, Color color)
+    public HexCell getHex(Vector3 position)
     {
         position = transform.InverseTransformPoint(position);
         HexCoordinates coordinates = HexCoordinates.FromPosition(position);
         int index = coordinates.X + coordinates.Z * width + coordinates.Z / 2;
-        HexCell hex = hexGrid[index];
-        hex.color = color;
-        hexMesh.createHexMesh(hexGrid);
+        return hexGrid[index];
     }
+
+    /*
+     *  remakes the mesh
+     */
+     public void refresh()
+     {
+         hexMesh.createHexMesh(hexGrid);
+     }
 }

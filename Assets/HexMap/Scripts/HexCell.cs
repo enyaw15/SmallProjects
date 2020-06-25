@@ -10,6 +10,17 @@ public class HexCell : MonoBehaviour
 
     //the coordinates of the hex
     public HexCoordinates coordinates;
+    //the height of the hex
+    private int elevation;
+    public int Elevation{
+        get{ return elevation;}
+        set{
+            elevation = value;
+			Vector3 position = transform.localPosition;
+			position.y = value * HexMetrics.elevationStep;
+			transform.localPosition = position;
+        }
+    }
     //the color of the hex
     public Color color;
 
