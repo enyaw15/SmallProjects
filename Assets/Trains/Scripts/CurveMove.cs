@@ -22,6 +22,6 @@ public class CurveMove : MonoBehaviour
         {
             t = 0;
         }
-        moving.position = curve.GetPoint(t);
+        moving.position = curve.getPoint(t);
     }
 }

@@ -20,7 +20,7 @@ public class TrackData
 
     public Vector3 getPoint(float t)
     {
-        return (Bezier.GetPoint(points[0], points[1], points[2], t));
+        return (Bezier.getPoint(points[0], points[1], points[2], t));
     }
 
     public Vector3 getVelocity(float t)

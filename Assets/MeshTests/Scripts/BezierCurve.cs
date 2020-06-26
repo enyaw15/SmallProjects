@@ -27,9 +27,9 @@ public class BezierCurve : MonoBehaviour {
 
     public Vector3[] points;
 
-    public Vector3 GetPoint(float t)
+    public Vector3 getPoint(float t)
     {
-        return transform.TransformPoint(Bezier.GetPoint(points[0], points[1], points[2], t));
+        return transform.TransformPoint(Bezier.getPoint(points[0], points[1], points[2],points[3], t));
     }
 
     public void Reset()
@@ -37,20 +37,21 @@ public class BezierCurve : MonoBehaviour {
         points = new Vector3[] {
             new Vector3(1f, 0f, 0f),
             new Vector3(2f, 0f, 0f),
-            new Vector3(3f, 0f, 0f)
+            new Vector3(3f, 0f, 0f),
+            new Vector3(4f, 0f, 0f)
         };
     }
-    public Vector3 GetVelocity(float t)
+    public Vector3 getDirection(float t)
     {
-        return transform.TransformPoint(Bezier.GetFirstDerivative(points[0], points[1], points[2], t)) - transform.position;
+        return transform.TransformPoint(Bezier.getFirstDerivative(points[0], points[1], points[2],points[3], t)) - transform.position;
     }
 }
 
-//contains the math for quadratic bezier curves
+//contains the math for quadratic and cubic bezier curves
 public static class Bezier
 {
     //gives a point from the functoin B(t) as defined in the header comment
-    public static Vector3 GetPoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+    public static Vector3 getPoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
     {
         t = Mathf.Clamp01(t);// for 0<t<1
         float oneMinusT = 1f - t;
@@ -59,10 +60,24 @@ public static class Bezier
     }
 
     //returns the first derivative of the function B(t). B'(t) as definded in the header
-    public static Vector3 GetFirstDerivative(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+    public static Vector3 getFirstDerivative(Vector3 p0, Vector3 p1, Vector3 p2, float t)
     {
+        t = Mathf.Clamp01(t);// for 0<t<1
         //B'(t) = 2(1-t)(P0-P1) +2t(P2-P1)
         return 2f * (1f - t) * (p1 - p0) + 2f * t * (p2 - p1);
     }
+
+    //returs a point on the a cubic bezier curve
+    public static Vector3 getPoint (Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t) {
+		t = Mathf.Clamp01(t);// for 0<t<1
+		float oneMinusT = 1f - t;
+		return oneMinusT * oneMinusT * oneMinusT * p0 + 3f * oneMinusT * oneMinusT * t * p1 + 3f * oneMinusT * t * t * p2 + t * t * t * p3;
+	}
+	//returns the derivative at a point on a bezier curve
+	public static Vector3 getFirstDerivative (Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t) {
+		t = Mathf.Clamp01(t);// for 0<t<1
+		float oneMinusT = 1f - t;
+		return 3f * oneMinusT * oneMinusT * (p1 - p0) + 6f * oneMinusT * t * (p2 - p1) + 3f * t * t * (p3 - p2);
+	}
 
 }

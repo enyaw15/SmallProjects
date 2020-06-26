@@ -54,7 +54,7 @@ public class TrackManager : MonoBehaviour
             for(int i = 0; i < trackDensity; i++)
             {
                 GameObject o = Instantiate(obj);
-                o.GetComponent<Transform>().position = track.getPoint(i*.1f);
+                o.GetComponent<Transform>().position = track.getPoint(i/trackDensity);
             }
         }
     }
